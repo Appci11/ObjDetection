@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34031.279
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ObjectDetection", "ObjectDetection\ObjectDetection.csproj", "{9E93E59E-1BFE-4FDA-A23E-91F2C77EA2A1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeMokymo", "BeMokymo\BeMokymo.csproj", "{C7297352-4393-4DF4-B1AA-0799701334A2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9E93E59E-1BFE-4FDA-A23E-91F2C77EA2A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E93E59E-1BFE-4FDA-A23E-91F2C77EA2A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E93E59E-1BFE-4FDA-A23E-91F2C77EA2A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E93E59E-1BFE-4FDA-A23E-91F2C77EA2A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7297352-4393-4DF4-B1AA-0799701334A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7297352-4393-4DF4-B1AA-0799701334A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7297352-4393-4DF4-B1AA-0799701334A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7297352-4393-4DF4-B1AA-0799701334A2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DCAA7A2B-C28C-4C35-BDD3-72B1497D9A2E}
+	EndGlobalSection
+EndGlobal
