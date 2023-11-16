@@ -126,15 +126,32 @@ namespace Kriu
                     Console.WriteLine("No Predicted Bounding Boxes");
                     return;
                 }
-                var boxes =
-                    predictionResult.PredictedBoundingBoxes.Chunk(4)
-                        .Select(x => new { XTop = x[0], YTop = x[1], XBottom = x[2], YBottom = x[3] })
-                        .Zip(predictionResult.Score, (a, b) => new { Box = a, Score = b });
+                //var boxes =
+                //    predictionResult.PredictedBoundingBoxes.Chunk(4)
+                //        .Select(x => new { XTop = x[0], YTop = x[1], XBottom = x[2], YBottom = x[3] })
+                //        .Zip(predictionResult.Score, (a, b) => new { Box = a, Score = b });
 
-                foreach (var item in boxes)
+                //foreach (var item in boxes)
+                //{
+                //    Console.WriteLine($"XTop: {item.Box.XTop},YTop: {item.Box.YTop},XBottom: {item.Box.XBottom},YBottom: {item.Box.YBottom}, Score: {item.Score}");
+                //}
+                List<Box> Boxes = new List<Box>();
+                for (int i = 0; i < predictionResult.PredictedLabel.Length; i++)
                 {
-                    Console.WriteLine($"XTop: {item.Box.XTop},YTop: {item.Box.YTop},XBottom: {item.Box.XBottom},YBottom: {item.Box.YBottom}, Score: {item.Score}");
+                    Box box = new Box();
+                    box.Label = predictionResult.PredictedLabel[i];
+                    box.Score = predictionResult.Score[i];
+                    box.XTop = predictionResult.PredictedBoundingBoxes[4 * i];
+                    box.YTop = predictionResult.PredictedBoundingBoxes[4 * i + 1];
+                    box.XBottom = predictionResult.PredictedBoundingBoxes[4 * i + 2];
+                    box.YBottom = predictionResult.PredictedBoundingBoxes[4 * i + 3];
+                    Boxes.Add(box); //diletantiskai, bet tingiu perrasinet...
                 }
+                foreach (Box item in Boxes)
+                {
+                    Console.WriteLine($"XTop: {item.XTop},YTop: {item.YTop},XBottom: {item.XBottom},YBottom: {item.YBottom}, Score: {item.Score}, Label: {item.Label}");
+                }
+                Console.WriteLine("\n\n");
                 Console.WriteLine("\n\n");
             }
         }
