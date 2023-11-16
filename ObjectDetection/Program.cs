@@ -147,12 +147,16 @@ namespace Kriu
                     box.YBottom = predictionResult.PredictedBoundingBoxes[4 * i + 3];
                     Boxes.Add(box); //diletantiskai, bet tingiu perrasinet...
                 }
+                RemoveRepeatingBoxes(Boxes);
                 foreach (Box item in Boxes)
                 {
                     Console.WriteLine($"XTop: {item.XTop},YTop: {item.YTop},XBottom: {item.XBottom},YBottom: {item.YBottom}, Score: {item.Score}, Label: {item.Label}");
                 }
                 Console.WriteLine("\n\n");
-                Console.WriteLine("\n\n");
+
+                // ISSAUGOT I ILLUSTRATIONS LIST'A
+
+
             }
         }
 
@@ -188,6 +192,32 @@ namespace Kriu
                 document.Root.Add(elem);
             }
             return document;
+        }
+
+        // Jei 100% persidengia koordinates paliekam labiausiai tiketina
+        static void RemoveRepeatingBoxes(List<Box> Boxes)
+        {
+            Box[] ArrBox = Boxes.ToArray();
+            for(int i = 0; i < ArrBox.Length - 1; i++)
+            {
+                for(int j = i + 1; j < ArrBox.Length; j++)
+                {
+                    if(CompareBox(ArrBox[i], ArrBox[j]))
+                    {
+                        if (ArrBox[i].Score > ArrBox[j].Score)
+                        {
+                            Boxes.Remove(ArrBox[j]);
+                        }
+                        else Boxes.Remove(ArrBox[i]);
+                    }
+                }
+            }
+        }
+
+        static bool CompareBox(Box a, Box b)
+        {
+            return a.XBottom == b.XBottom && a.YBottom == b.YBottom &&
+                   a.XTop == b.XTop && a.YTop == b.YTop;
         }
     }
 }
