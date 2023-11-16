@@ -21,7 +21,7 @@ namespace Kriu
 
             //RecreateTempDir();    // istrinam pries paleidima buvusius pav, atkomentuot baigus testavima, dirbant su tikru pdf ir t.t.
             //PdfToImages();        // same as above
-            DetectObjects();
+            //DetectObjects();
 
             // testavimui start ---------------
             for (int i = 1; i < 3; i++)
