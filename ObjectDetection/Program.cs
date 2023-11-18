@@ -4,6 +4,7 @@ using System.Linq;
 using System.Xml.Linq;
 using PDFtoImage;
 using System;
+using MLModel_1;
 
 namespace Kriu
 {
@@ -23,12 +24,9 @@ namespace Kriu
             if (!Directory.Exists(tempPath)) Directory.CreateDirectory(tempPath);
             if (!Directory.Exists(resultsPath)) Directory.CreateDirectory(resultsPath);
 
-            
-
             //RecreateTempDir();    // istrinam pries paleidima buvusius pav, atkomentuot baigus testavima, dirbant su tikru pdf ir t.t.
             //PdfToImages();        // same as above
             DetectObjects();
-
             // testavimui start ---------------
             //for (int i = 1; i < 3; i++)
             //{
@@ -122,6 +120,7 @@ namespace Kriu
 
             int illNr = 0;  // illustration nr
 
+
             for (int pgNr = 1; pgNr <= ImgNames.Length; pgNr++) //foreach'as per failus eina 1 10 11 2 3 4... netinka
             {
                 Console.WriteLine($"File: page_{pgNr}");
@@ -137,7 +136,7 @@ namespace Kriu
                 if (predictionResult.PredictedBoundingBoxes == null)
                 {
                     Console.WriteLine("No Predicted Bounding Boxes");
-                    return;
+                    continue;
                 }
                 //var boxes =
                 //    predictionResult.PredictedBoundingBoxes.Chunk(4)
@@ -162,6 +161,7 @@ namespace Kriu
                     box.YBottom = predictionResult.PredictedBoundingBoxes[4 * i + 3];
                     Boxes.Add(box); //diletantiskai, bet tingiu perrasinet...
                 }
+
                 RemoveRepeatingBoxes(Boxes);
                 foreach (Box item in Boxes)
                 {
@@ -209,7 +209,7 @@ namespace Kriu
             Console.WriteLine("done.");
         }
 
-        static XDocument CreateXmlFile(List<Illustration> Illustrations)
+        static XDocument CreateXmlFile(List<Illustration> illustrations)
         {
             XDocument document = new XDocument
                 (

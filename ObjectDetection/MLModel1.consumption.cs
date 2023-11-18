@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
-namespace ObjectDetection
+namespace MLModel_1
 {
     public partial class MLModel1
     {
@@ -42,7 +42,7 @@ namespace ObjectDetection
             public uint[] Labels { get; set; }
 
             [ColumnName(@"Image")]
-            [Microsoft.ML.Transforms.Image.ImageType(600, 800)]
+            [Microsoft.ML.Transforms.Image.ImageType(891, 630)]
             public MLImage Image { get; set; }
 
             [ColumnName(@"Box")]

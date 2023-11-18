@@ -14,13 +14,13 @@ using Microsoft.ML.TorchSharp.AutoFormerV2;
 using System.Text.Json.Nodes;
 using System.Text.Json;
 
-namespace ObjectDetection
+namespace MLModel_1
 {
     public partial class MLModel1
     {
         public const string RetrainFilePath = @"D:\aaa\Dataset Target\vott-json-export\Figures_Tables-Detection-export.json";
-        public const int TrainingImageWidth = 800;
-        public const int TrainingImageHeight = 600;
+        public const int TrainingImageWidth = 630;
+        public const int TrainingImageHeight = 891;
 
         /// <summary>
         /// Train a new model with the provided dataset.
@@ -29,12 +29,12 @@ namespace ObjectDetection
         /// <param name="inputDataFilePath">Path to the data file for training.</param>
         public static void Train(string outputModelPath, string inputDataFilePath = RetrainFilePath)
         {
-            var mlContext = new MLContext();
-            mlContext.GpuDeviceId = 0;
-            mlContext.FallbackToCpu = false;
-            var data = LoadIDataViewFromVOTTFile(mlContext, inputDataFilePath);
-            var model = RetrainModel(mlContext, data);
-            SaveModel(mlContext, model, data, outputModelPath);
+           var mlContext = new MLContext();
+           mlContext.GpuDeviceId = 0;
+           mlContext.FallbackToCpu = false;
+           var data = LoadIDataViewFromVOTTFile(mlContext, inputDataFilePath);
+           var model = RetrainModel(mlContext, data);
+           SaveModel(mlContext, model, data, outputModelPath);
         }
 
         // <summary>
@@ -44,7 +44,7 @@ namespace ObjectDetection
         /// <param name="inputDataFilePath">Path to the vott data file for training.</param>
         public static IDataView LoadIDataViewFromVOTTFile(MLContext mlContext, string inputDataFilePath)
         {
-            return mlContext.Data.LoadFromEnumerable(LoadFromVott(inputDataFilePath));
+           return mlContext.Data.LoadFromEnumerable(LoadFromVott(inputDataFilePath));
         }
 
         private static IEnumerable<ModelInput> LoadFromVott(string inputDataFilePath)
@@ -63,7 +63,7 @@ namespace ObjectDetection
                 var boxList = new List<float>();
 
                 var sourceWidth = asset.Value["asset"]["size"]["width"].GetValue<float>();
-                var sourceHeight = asset.Value["asset"]["size"]["height"].GetValue<float>();
+                var sourceHeight = asset.Value["asset"]["size"]["height"].GetValue<float>();   
 
                 CalculateAspectAndOffset(sourceWidth, sourceHeight, TrainingImageWidth, TrainingImageHeight, out float xOffset, out float yOffset, out float aspect);
 
@@ -83,8 +83,8 @@ namespace ObjectDetection
                         boxList.Add(xOffset + ((left + width) * aspect));
                         boxList.Add(yOffset + ((top + height) * aspect));
                     }
-
-                }
+                    
+                }    
 
                 var mlImage = MLImage.CreateFromFile(asset.Value["asset"]["path"].GetValue<string>().Replace("file:", ""));
                 var modelInput = new ModelInput()
@@ -92,7 +92,7 @@ namespace ObjectDetection
                     Image = mlImage,
                     Labels = labelList.ToArray(),
                     Box = boxList.ToArray(),
-                };
+                };    
 
                 imageData.Add(modelInput);
             }
@@ -109,8 +109,8 @@ namespace ObjectDetection
             if (heightAspect < widthAspect)
             {
                 aspect = heightAspect;
-                xOffset = (destinationWidth - (sourceWidth * aspect)) / 2;
-            }
+                xOffset = (destinationWidth - (sourceWidth * aspect)) / 2;     
+            }    
             else
             {
                 aspect = widthAspect;
@@ -159,12 +159,12 @@ namespace ObjectDetection
         public static IEstimator<ITransformer> BuildPipeline(MLContext mlContext)
         {
             // Data process configuration with pipeline data transformations
-            var pipeline = mlContext.Transforms.Conversion.MapValueToKey(outputColumnName: @"Labels", inputColumnName: @"Labels", addKeyValueAnnotationsAsText: false)
-                                    .Append(mlContext.Transforms.ResizeImages(outputColumnName: @"Image", inputColumnName: @"Image", imageHeight: TrainingImageHeight, imageWidth: TrainingImageWidth, cropAnchor: ImageResizingEstimator.Anchor.Center, resizing: ImageResizingEstimator.ResizingKind.IsoPad))
-                                    .Append(mlContext.MulticlassClassification.Trainers.ObjectDetection(new ObjectDetectionTrainer.Options() { LabelColumnName = @"Labels", PredictedLabelColumnName = @"PredictedLabel", BoundingBoxColumnName = @"Box", ImageColumnName = @"Image", ScoreColumnName = @"score", MaxEpoch = 50, InitLearningRate = 1, WeightDecay = 0, }))
-                                    .Append(mlContext.Transforms.Conversion.MapKeyToValue(outputColumnName: @"PredictedLabel", inputColumnName: @"PredictedLabel"));
+            var pipeline = mlContext.Transforms.Conversion.MapValueToKey(outputColumnName:@"Labels",inputColumnName:@"Labels",addKeyValueAnnotationsAsText:false)      
+                                    .Append(mlContext.Transforms.ResizeImages(outputColumnName:@"Image",inputColumnName:@"Image",imageHeight:TrainingImageHeight,imageWidth:TrainingImageWidth,cropAnchor:ImageResizingEstimator.Anchor.Center,resizing:ImageResizingEstimator.ResizingKind.IsoPad))      
+                                    .Append(mlContext.MulticlassClassification.Trainers.ObjectDetection(new ObjectDetectionTrainer.Options(){LabelColumnName=@"Labels",PredictedLabelColumnName=@"PredictedLabel",BoundingBoxColumnName=@"Box",ImageColumnName=@"Image",ScoreColumnName=@"score",MaxEpoch=50,InitLearningRate=1,WeightDecay=0,}))      
+                                    .Append(mlContext.Transforms.Conversion.MapKeyToValue(outputColumnName:@"PredictedLabel",inputColumnName:@"PredictedLabel"));
 
             return pipeline;
         }
     }
-}
+ }
