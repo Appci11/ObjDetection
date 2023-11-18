@@ -3,6 +3,7 @@ using Microsoft.ML.Data;
 using System.Linq;
 using System.Xml.Linq;
 using PDFtoImage;
+using System;
 
 namespace Kriu
 {
@@ -11,33 +12,39 @@ namespace Kriu
         public static string dataPath = Directory.GetCurrentDirectory() + @"\data";
         public static string tempPath = Directory.GetCurrentDirectory() + @"\temp"; //darbo metu atsiradusiem pav
         public static string resultsPath = Directory.GetCurrentDirectory() + @"\results";
+
+        public static string pdfFileId = "TestId";
+        public static List<Illustration> Illustrations = new List<Illustration>();
+
+
         public static void Main()
         {
             if (!Directory.Exists(dataPath)) Directory.CreateDirectory(dataPath);
             if (!Directory.Exists(tempPath)) Directory.CreateDirectory(tempPath);
             if (!Directory.Exists(resultsPath)) Directory.CreateDirectory(resultsPath);
 
-            List<Illustration> Illustrations = new List<Illustration>();
+            
 
             //RecreateTempDir();    // istrinam pries paleidima buvusius pav, atkomentuot baigus testavima, dirbant su tikru pdf ir t.t.
             //PdfToImages();        // same as above
-            //DetectObjects();
+            DetectObjects();
 
             // testavimui start ---------------
-            for (int i = 1; i < 3; i++)
-            {
-                Illustrations.Add(new Illustration(
-                    number: i,
-                    name: $"Vardas_{i}",
-                    type: $"Tipas_{i}",
-                    page: i,
-                    left: 10,
-                    top: 20,
-                    right: 30,
-                    bottom: 40));
-            }
+            //for (int i = 1; i < 3; i++)
+            //{
+            //    Illustrations.Add(new Illustration(
+            //        number: i,
+            //        name: $"Vardas_{i}",
+            //        type: "Tipas",
+            //        page: i,
+            //        left: 10,
+            //        top: 20,
+            //        right: 30,
+            //        bottom: 40));
+            //}
             // testavimui end ---------------
-            //SaveXml(Illustrations);
+
+            SaveXml(Illustrations);
         }
         static void RecreateTempDir()
         {
@@ -80,6 +87,7 @@ namespace Kriu
                 Console.WriteLine("Data file not found.");
                 return;
             }
+            pdfFileId = pdfName.Substring(0, pdfName.Length - 4);
             Console.WriteLine("Found data file: {0}", pdfName);
             Console.WriteLine("Using .pdf to create images... ");
             Byte[] bytes = File.ReadAllBytes(dataPath + @"\" + pdfName);
@@ -106,13 +114,18 @@ namespace Kriu
                 return;
             }
 
-            //for (int i = 1; i < 9; i++)
-            foreach (string? imgName in ImgNames)
+            // priklausomai ar tinka tik illNr naudot, ar atskirai tiek vienam tipui
+            //int figureCount = 0;
+            //int tableCount = 0;
+            //int insertCount = 0;
+            //int nameCount = 0;  // siaip reikia vardo/pavardes, pakeist jei atsiras
+
+            int illNr = 0;  // illustration nr
+
+            for (int pgNr = 1; pgNr <= ImgNames.Length; pgNr++) //foreach'as per failus eina 1 10 11 2 3 4... netinka
             {
-                //string imgName = "Screenshot_4" + i + ".png";
-                //string path = @"D:\aaa\Dataset Test\" + imgName;
-                Console.WriteLine($"File: {imgName}");
-                string path = tempPath + @"\" + imgName;
+                Console.WriteLine($"File: page_{pgNr}");
+                string path = $"{tempPath}\\page_{pgNr}.png";
                 var image = MLImage.CreateFromFile(path);
                 MLModel1.ModelInput sampleData = new MLModel1.ModelInput()
                 {
@@ -135,6 +148,8 @@ namespace Kriu
                 //{
                 //    Console.WriteLine($"XTop: {item.Box.XTop},YTop: {item.Box.YTop},XBottom: {item.Box.XBottom},YBottom: {item.Box.YBottom}, Score: {item.Score}");
                 //}
+
+
                 List<Box> Boxes = new List<Box>();
                 for (int i = 0; i < predictionResult.PredictedLabel.Length; i++)
                 {
@@ -151,20 +166,47 @@ namespace Kriu
                 foreach (Box item in Boxes)
                 {
                     Console.WriteLine($"XTop: {item.XTop},YTop: {item.YTop},XBottom: {item.XBottom},YBottom: {item.YBottom}, Score: {item.Score}, Label: {item.Label}");
+
+                    // darom lengvai redaguojamai...
+                    Illustration ill = new Illustration();
+                    ill.Number = ++illNr;
+                    ill.Page = pgNr;
+                    // berods nesumaisytos koordinates...
+                    ill.Left = item.XTop;
+                    ill.Top = item.YTop;
+                    ill.Right = item.XBottom;
+                    ill.Bottom = item.YBottom;
+                    switch (item.Label)
+                    {
+                        case "Figure":
+                            ill.Type = "f";
+                            break;
+                        case "Table":
+                            ill.Type = "t";
+                            break;
+                        case "Insert":
+                            ill.Type = "i";
+                            break;
+                        case "Name":
+                            ill.Type = "n";     // reiketu pakeist i tikra varda
+                            break;
+                    }
+                    string nameNr = ill.Number.ToString();  // numerio dalis varde
+                    if (nameNr.Length < 2) nameNr = "0" + nameNr;  // jei per trumpas pridedam 0
+                    ill.Name = pdfFileId + ill.Type + nameNr;
+
+                    Illustrations.Add(ill);
                 }
                 Console.WriteLine("\n\n");
-
-                // ISSAUGOT I ILLUSTRATIONS LIST'A
-
-
             }
         }
 
         static void SaveXml(List<Illustration> Illustrations)
         {
+            Console.Write("Generating .xml file... ");
             XDocument xmlDocument = CreateXmlFile(Illustrations);
-
             xmlDocument.Save(resultsPath + @"\" + "results.xml");
+            Console.WriteLine("done.");
         }
 
         static XDocument CreateXmlFile(List<Illustration> Illustrations)
@@ -198,11 +240,11 @@ namespace Kriu
         static void RemoveRepeatingBoxes(List<Box> Boxes)
         {
             Box[] ArrBox = Boxes.ToArray();
-            for(int i = 0; i < ArrBox.Length - 1; i++)
+            for (int i = 0; i < ArrBox.Length - 1; i++)
             {
-                for(int j = i + 1; j < ArrBox.Length; j++)
+                for (int j = i + 1; j < ArrBox.Length; j++)
                 {
-                    if(CompareBox(ArrBox[i], ArrBox[j]))
+                    if (CompareBox(ArrBox[i], ArrBox[j]))
                     {
                         if (ArrBox[i].Score > ArrBox[j].Score)
                         {
