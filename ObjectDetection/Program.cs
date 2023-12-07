@@ -4,7 +4,6 @@ using System.Linq;
 using System.Xml.Linq;
 using PDFtoImage;
 using System;
-using MLModel_1;
 
 namespace Kriu
 {
@@ -24,9 +23,9 @@ namespace Kriu
             if (!Directory.Exists(tempPath)) Directory.CreateDirectory(tempPath);
             if (!Directory.Exists(resultsPath)) Directory.CreateDirectory(resultsPath);
 
-            //RecreateTempDir();    // istrinam pries paleidima buvusius pav, atkomentuot baigus testavima, dirbant su tikru pdf ir t.t.
-            //PdfToImages();        // same as above
-            DetectObjects();
+            RemoveOldFiles();
+            PdfToImages();
+            //DetectObjects();
             // testavimui start ---------------
             //for (int i = 1; i < 3; i++)
             //{
@@ -44,13 +43,27 @@ namespace Kriu
 
             SaveXml(Illustrations);
         }
-        static void RecreateTempDir()
+        static void RemoveOldFiles()
         {
             if (Directory.Exists(tempPath))
             {
-                Directory.Delete(tempPath, true);
+                DirectoryInfo di = new DirectoryInfo(tempPath);
+
+                foreach (FileInfo file in di.GetFiles())
+                {
+                    file.Delete();
+                }
+                foreach (DirectoryInfo dir in di.GetDirectories())
+                {
+                    dir.Delete(true);
+                }
             }
-            Directory.CreateDirectory(tempPath);
+
+            //if (Directory.Exists(tempPath))
+            //{
+            //    Directory.Delete(tempPath, true);
+            //}
+            //Directory.CreateDirectory(tempPath);
         }
 
         static string?[] DirectoryFileNames(string path)

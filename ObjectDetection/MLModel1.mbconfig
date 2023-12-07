@@ -17,8 +17,8 @@
         "Version": 1,
         "Type": "Trial",
         "TrainerName": "ObjectDetectionMulti",
-        "Score": 0.52119612693786621,
-        "RuntimeInSeconds": 7192.961,
+        "Score": 0.48893943428993225,
+        "RuntimeInSeconds": 10304.862,
         "Parameter": {
           "_SCHEMA_": "e0 * e1 * e2 * e3",
           "e0": {
@@ -41,11 +41,11 @@
             "BoundingBoxColumnName": "Box",
             "ImageColumnName": "Image",
             "ScoreColumnName": "score",
-            "MaxEpoch": 50,
+            "MaxEpoch": 70,
             "InitLearningRate": 1.0,
             "WeightDecay": 0.0,
-            "IOUThreshold": 0.5,
-            "ScoreThreshold": 0.699999988079071
+            "IOUThreshold": 0.0,
+            "ScoreThreshold": 0.75
           },
           "e3": {
             "OutputColumnName": "PredictedLabel",
@@ -62,7 +62,7 @@
     },
     "Schema": "e0 * e1 * e2 * e3",
     "MetricName": "mAP50_95",
-    "ModelFilePath": "D:\\aaa\\Detection 2\\MLModel1.mlnet"
+    "ModelFilePath": "D:\\aaa\\ObjDetection\\ObjectDetection\\MLModel1.mlnet"
   },
   "Type": "TrainingConfig",
   "Version": 4,
@@ -70,9 +70,9 @@
     "Version": 0,
     "Type": "ObjectDetectionTrainingOption",
     "TrainingTime": 2147483647,
-    "Epoch": 50,
-    "ScoreThreshold": 0.7,
-    "IOUThreshold": 0.5,
+    "Epoch": 70,
+    "ScoreThreshold": 0.75,
+    "IOUThreshold": 0.0,
     "ValidationOption": {
       "Version": 0,
       "Type": "TrainValidateSplitValidationOption",
